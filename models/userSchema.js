@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
         required :[true,"Please provide you password"],
         minLength :[8,"Passwrod must contain at least 8 character"],
         maxLength :[32,"Password must contain at most 32 character"],
+        select:false,
     },
     role:{
         type:String,
@@ -36,30 +37,25 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-//Hashing the password 
-userSchema.pre("save",async function(next){
-    if(this.isModified("password"))
-        {
-            next();
-        }
-        this.password=await bcrypt.hash(this.password,10);
-});
-
-//Comparing Password
-
-userSchema.methods.comparePassword =async  function(enteredPassword){
-   return await bcrypt.compare(enteredPassword,this.password);
-};
-
+//ENCRYPTING THE PASSWORD WHEN THE USER REGISTERS OR MODIFIES HIS PASSWORD
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) {
+      next();
+    }
+    this.password = await bcrypt.hash(this.password, 10);
+  });
+  
+  //COMPARING THE USER PASSWORD ENTERED BY USER WITH THE USER SAVED PASSWORD
+  userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
 
 //Generating A jwt token for authorization
 
-userSchema.methods.getJWTToken= function(){
-    return jwt.sign({  id: this._id},
-        process.env.JWT_SECRET_KEY,{
-            expiresIn:process.env.JWT.EXPIRE
-        }
-    );
-};
+userSchema.methods.getJWTToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn:process.env.JWT_EXPIRE,
+    });
+  };
 
 export const User =mongoose.model("User",userSchema);

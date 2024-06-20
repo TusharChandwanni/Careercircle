@@ -12,8 +12,6 @@ import { errorMiddleware } from "./middleware/error.js";
 import {register} from "./controllers/userController.js";
 
 const app =express();
-
-
 dotenv.config({path:'./config/config.env'});
 
 app.use(cors({
@@ -31,10 +29,10 @@ app.use(fileUpload({
     tempFileDir :"/tmp/",
 }));//multer
 
-app.post("tush",register);
-app.use('./api/v1/user',userRouter);
-app.use('./api/v1/job',jobRouter);
-app.use('./api/v1/application',applicationRouter);
+//app.post("/tush",register);
+app.use('/api/v1/user',userRouter);
+app.use('/api/v1/job',jobRouter);
+app.use('/api/v1/application',applicationRouter);
 
 dbConnection();
 
